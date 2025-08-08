@@ -18,14 +18,14 @@ Cada projeto está em sua própria pasta, com um `README.md` específico explica
 
 ---
 
-## 1️⃣ [Sistema Bancário v1.0](https://github.com/Ryugms/desafios/tree/main/desafios/sistema_bancario_1.0)
+## 1️⃣ [Sistema Bancário v1.0](https://github.com/Ryugms/desafios/tree/main/sistema_bancario_1.0)
 - **Descrição:** Primeira versão de um sistema bancário simples.
 - **Principais funções:** Depósito, saque e extrato.
 - **Objetivo:** Exercitar conceitos básicos de Python como controle de fluxo e variáveis.
 
 ---
 
-## 2️⃣ [Sistema Bancário v2.0](https://github.com/Ryugms/desafios/tree/main/desafios/sistema_bancario_2.0)
+## 2️⃣ [Sistema Bancário v2.0](https://github.com/Ryugms/desafios/tree/main/sistema_bancario_2.0)
 - **Descrição:** Versão aprimorada com múltiplos usuários e contas, limites de saque e formatação de dados.
 - **Principais funções:**  
   - Cadastro de usuários com CPF único  
