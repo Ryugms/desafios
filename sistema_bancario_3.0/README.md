@@ -103,8 +103,8 @@ venv\Scripts\activate    # Windows
 pyhton sistema_bancario_3.0.py
 
 🖥 Exemplo de Uso
-
 ================ MENU ================
+
 [1] Novo Usuário
 [2] Nova Conta
 [3] Depositar
@@ -113,6 +113,7 @@ pyhton sistema_bancario_3.0.py
 [6] Listar Usuários
 [7] Listar Contas
 [0] Sair
+
 =======================================
 => 1
 Nome: João
