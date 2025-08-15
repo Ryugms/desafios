@@ -90,7 +90,7 @@ Cliente (Pessoa Física)
 
 ## ⚙️ Como Executar
 1. **Clone o repositório**
-```bash
+
 git clone https://github.com/Ryugms/sistema-bancario.git
 cd sistema_bancario_3.0
 
