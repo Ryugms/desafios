@@ -91,7 +91,7 @@ Cliente (Pessoa Física)
 ## ⚙️ Como Executar
 1. **Clone o repositório**
 
-git clone https://github.com/Ryugms/sistema-bancario.git
+git clone [https://github.com/Ryugms/sistema-bancario3.0.git](https://github.com/Ryugms/desafios/blob/main/sistema_bancario_3.0/sistema_bancario_3.0.py)
 cd sistema_bancario_3.0
 
 2. ** (Opcional) Crie um ambiente virtual**
