@@ -99,9 +99,7 @@ python -m venv venv
 source venv/bin/activate  # Linux/Mac
 venv\Scripts\activate    # Windows
 
-3. ** Execute o programa **
-pyhton sistema_bancario_3.0.py
-
+Exemplo:
 ================ MENU ================
 [1] Novo Usuário
 [2] Nova Conta
