@@ -1,13 +1,13 @@
-## Sistema Bancário 4.0 ##
+## Sistema Bancario 4.0 ##
 
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, date
 import textwrap
 
 # ==============================
 # Constantes
 # ==============================
-LIMITE_SAQUES = 3
+LIMITE_SAQUES = 10
 LIMITE = 500
 AGENCIA = "0001"
 
@@ -22,7 +22,7 @@ def log_transacao(func):
             data_hora = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
             tipo = func.__name__.capitalize()
             log = f"[{data_hora}] {tipo} efetuado com sucesso!"
-            self._extrato.append(data_hora)  # grava no histórico
+            self._extrato.append(log)  # grava no histórico
             print(f"[LOG] {log}")       # printa no console
         return resultado
     return wrapper
@@ -86,6 +86,8 @@ class Conta(ABC):
         self._saldo = 0.0
         self._extrato = []
         self._numero_saques = 0
+        self._data_ultimo_saque = date.today()
+        self._criada_em = datetime.now()   # data/hora de criação da conta
 
     @property
     def saldo(self):
@@ -103,6 +105,10 @@ class Conta(ABC):
     def agencia(self):
         return self._agencia
 
+    @property
+    def criada_em(self):
+        return self._criada_em
+
     @abstractmethod
     def sacar(self, valor):
         pass
@@ -118,15 +124,17 @@ class Conta(ABC):
             print("Valor inválido para depósito.")
             return False
 
-    def exibir_extrato(self):
-        print("\n####################### EXTRATO ######################")
-        if self._extrato:
+    # Extrato corrigido
+    def exibir_extrato(self) -> None:
+        print("\n############################ EXTRATO ###########################")
+        print(f"Agência {self.agencia}  Conta {self.numero}  Cliente: {self.cliente.nome}")
+        if not self._extrato:
+            print("Não foram realizadas movimentações.")
+        else:
             for mov in self._extrato:
                 print(mov)
-        else:
-            print("Nenhuma movimentação realizada.")
-        print(f"Saldo atual: R$ {self._saldo:.2f}")
-        print("######################################################\n")
+        print(f"Saldo atual: R$ {self.saldo:.2f}")
+        print("################################################################\n")
 
     # ===== Gerador de Relatórios =====
     def gerar_transacoes(self, tipo=None):
@@ -140,15 +148,31 @@ class Conta(ABC):
 # Contas específicas
 # ==============================
 class ContaCorrente(Conta):
+    def __init__(
+        self,
+        cliente: Cliente,
+        numero: int,
+        limite: float = LIMITE,
+        limite_saques: int = LIMITE_SAQUES,
+    ) -> None:
+        super().__init__(cliente, numero)
+        self.limite = float(limite)
+        self.limite_saques = int(limite_saques)
+
     @log_transacao
     def sacar(self, valor):
+        hoje = date.today()
+        if self._data_ultimo_saque != hoje:
+            self._numero_saques = 0
+            self._data_ultimo_saque = hoje
+
         if valor > self._saldo:
             print("Saldo insuficiente.")
             return False
-        elif valor > LIMITE:
+        elif valor > self.limite:
             print("Valor excede o limite de saque.")
             return False
-        elif self._numero_saques >= LIMITE_SAQUES:
+        elif self._numero_saques >= self.limite_saques:
             print("Limite de saques diários excedido.")
             return False
         elif valor > 0:
@@ -165,12 +189,18 @@ class ContaCorrente(Conta):
 class ContaPoupanca(Conta):
     @log_transacao
     def sacar(self, valor):
+        hoje = date.today()
+        if self._data_ultimo_saque != hoje:
+            self._numero_saques = 0
+            self._data_ultimo_saque = hoje
+
         if valor > self._saldo:
             print("Saldo insuficiente.")
             return False
         elif valor > 0:
             self._saldo -= valor
             self._extrato.append(f"Saque: R$ {valor:.2f}")
+            self._numero_saques += 1
             print("Saque realizado com sucesso!")
             return True
         else:
@@ -196,9 +226,8 @@ class ContaIterador:
         conta = self._contas[self._i]
         self._i += 1
         return (
-            f"Agência: {conta.agencia} | Conta: {conta.numero} | "
-            f"Tipo: {conta.__class__.__name__} | Cliente: {conta.cliente.nome_completo} | "
-            f"Saldo: R$ {conta.saldo:.2f}"
+            f"Cliente: {conta.cliente.nome_completo} |\n Agência: {conta.agencia} |"
+            f" Conta: {conta.numero} | Tipo: {conta.__class__.__name__} | Saldo: R$ {conta.saldo:.2f}"
         )
 
 
@@ -210,13 +239,14 @@ class Banco:
         self.clientes = []
         self.contas = []
 
+    # Opção 4
     def cadastrar_cliente(self):
         cpf = input("CPF (apenas números): ").strip()
         if any(c.cpf == cpf for c in self.clientes):
             print("Usuário já cadastrado com este CPF.")
             return
 
-        nome = input("Nome: ").strip()
+        nome = input("Nome Completo: ").strip()
         estado_civil = input("Estado Civil: ").strip()
         data_nascimento = input("Data de Nascimento (DDMMAAAA): ").strip()
         telefone = input("Telefone (DDD + número): ").strip()
@@ -226,11 +256,13 @@ class Banco:
         self.clientes.append(cliente)
         print("Usuário cadastrado com sucesso!")
 
+    # Opção 6
     def listar_clientes(self):
         for c in self.clientes:
-            print(f"{c.nome_completo} \n - Nasc.: {Formatador.data_nascimento(c.data_nascimento)} - CPF: {Formatador.cpf(c.cpf)}")
+            print(f"\n   {c.nome_completo} \n - Nasc.: {Formatador.data_nascimento(c.data_nascimento)} - CPF: {Formatador.cpf(c.cpf)}")
             print(f" - Tel: {Formatador.telefone(c.telefone)} Estado Civil: {c.estado_civil} \n - {Formatador.endereco(c.endereco)}\n")
 
+    # Opção 5
     def criar_conta(self):
         cpf = input("Informe o CPF do usuário: ").strip()
         cliente = next((c for c in self.clientes if c.cpf == cpf), None)
@@ -254,18 +286,24 @@ class Banco:
         self.contas.append(conta)
         print(f"Conta criada com sucesso! Agência: {AGENCIA} Conta: {numero}")
 
+    # Opção 8
     def gerar_relatorio(self, filtro=None):
         print("\n===== RELATÓRIO DE CONTAS =====")
         for conta in self.contas:
             if not filtro or isinstance(conta, filtro):
-                print(f" - {conta.__class__.__name__} | Agência: {conta.agencia} Conta: {conta.numero} | Cliente: {conta.cliente.nome_completo} | Saldo: R$ {conta.saldo:.2f}")
+                print(f"\nCliente: {conta.cliente.nome_completo}")
+                print(f"Agência: {conta.agencia} Conta: {conta.numero} Tipo: {conta.__class__.__name__}")
+                print(f"Saldo: R$ {conta.saldo:.2f}")
+                print(f"Data de criação: {conta.criada_em.strftime('%d/%m/%Y %H:%M:%S')}")
+                print(f"Saques realizados hoje: {conta._numero_saques}")
         print("=================================\n")
 
+    # Opção 9
     def listar_contas(self):
         for conta in self.contas:
-            print(f"Agência: {conta.agencia}, Conta: {conta.numero}, Tipo: {conta.__class__.__name__}, Cliente: {conta.cliente.nome_completo}")
+            print(f" Cliente: {conta.cliente.nome_completo}, Agência: {conta.agencia}, Conta: {conta.numero}, Tipo: {conta.__class__.__name__}")
 
-    # ---- NOVO: Listagem via iterador personalizado ----
+    # ----  Listagem via iterador personalizado ----
     def listar_contas_iterador(self):
         if not self.contas:
             print("Nenhuma conta cadastrada.")
@@ -275,17 +313,25 @@ class Banco:
             print(info)
         print("=========================================\n")
 
+def ler_numero(mensagem, tipo=int):
+    while True:
+        valor = input(mensagem).strip()
+        if not valor:  # se vazio ou só espaço
+            print("Opção inválida. Digite novamente.")
+            continue
+        try:
+            return tipo(valor)  # tenta converter para int ou float
+        except ValueError:
+            print("Entrada inválida. Digite um número válido.")
 
-# ==============================
-# Programa principal
-# ==============================
+
 def main():
     banco = Banco()
 
     menu_texto = """
     ===========================================================
-    |		      $ BANCO PAYPY $			      |
-    =========================== MENU =========================
+    |		      $ BANCO PAYPY $			  |
+    =========================== MENU ==========================
             [1] Depositar
             [2] Sacar
             [3] Extrato
@@ -300,32 +346,31 @@ def main():
     => """
 
     while True:
-        opcao = input(textwrap.dedent(menu_texto))
+        opcao = input(textwrap.dedent(menu_texto)).strip()
 
         if opcao == "1":
-            numero = int(input("Informe o número da conta: "))
+            numero = ler_numero("Informe o número da conta: ", int)
             conta = next((c for c in banco.contas if c.numero == numero), None)
             if conta:
-                valor = float(input("Valor para depósito: "))
+                valor = ler_numero("Valor para depósito: ", float)
                 conta.depositar(valor)
             else:
                 print("Conta não encontrada.")
 
         elif opcao == "2":
-            numero = int(input("Informe o número da conta: "))
+            numero = ler_numero("Informe o número da conta: ", int)
             conta = next((c for c in banco.contas if c.numero == numero), None)
             if conta:
-                valor = float(input("Valor para saque: "))
+                valor = ler_numero("Valor para saque: ", float)
                 conta.sacar(valor)
             else:
                 print("Conta não encontrada.")
 
         elif opcao == "3":
-            numero = int(input("Informe o número da conta: "))
+            numero = ler_numero("Informe o número da conta: ", int)
             conta = next((c for c in banco.contas if c.numero == numero), None)
             if conta:
                 conta.exibir_extrato()
-                # exemplo de uso do gerador de relatórios:
                 print("\n--- Transações filtradas (saques) ---")
                 for t in conta.gerar_transacoes("saque"):
                     print(t)
@@ -355,7 +400,6 @@ def main():
             break
         else:
             print("Opção inválida.")
-
 
 if __name__ == "__main__":
     main()
