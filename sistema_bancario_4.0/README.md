@@ -32,7 +32,7 @@ Um sistema bancário em **Python** que implementa operações de depósito, saqu
 1. Clone este repositório:
 
    ```bash
-   git clone https://github.com/Ryugms/desafios/sistema-bancario-4.0.git
+   [git clone https://github.com/Ryugms/desafios/tree/main/sistema_bancario_4.0.git
    ```
 
 2. Entre na pasta do projeto:
