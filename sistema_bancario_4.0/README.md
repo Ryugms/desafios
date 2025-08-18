@@ -38,13 +38,13 @@ Um sistema bancário em **Python** que implementa operações de depósito, saqu
 2. Entre na pasta do projeto:
 
    ```bash
-   cd sistema-bancario-4.0
+   cd sistema_bancario_4.0
    ```
 
 3. Execute o script principal:
 
    ```bash
-   python sistema_bancario.py
+   python sistema_bancario_4.0.py
    ```
 
 ## 📖 Menu Principal
